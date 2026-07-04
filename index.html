@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wedding Invitation</title>
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div id="loading">
+
+<div class="loader"></div>
+
+<h2>Loading Invitation...</h2>
+
+</div>
+
+<div id="envelope">
+
+    <div id="cover"></div>
+
+    <div id="letter">
+        💌
+    </div>
+
+</div>
+
+<div id="namePage">
+
+<div class="card">
+
+<h2>💌 Welcome</h2>
+
+<p>Please Enter Your Name</p>
+
+<input
+type="text"
+id="guestName"
+placeholder="Enter Your Name">
+
+<br><br>
+
+<button onclick="saveName()">
+
+Continue
+
+</button>
+
+</div>
+
+</div>
+
+<div id="greeting">
+
+<div class="card">
+
+<h1>💌</h1>
+
+<h2 style="color:white;margin-top:10px;">
+Wedding Invitation
+</h2>
+
+<h3 id="welcomeGuest"></h3>
+
+<p>
+
+Aapke liye ek khaas Wedding Invitation hai ❤️
+
+<br><br>
+
+Click karke invitation open kijiye.
+
+</p>
+<button onclick="openScratch()">
+
+Open Invitation
+
+</button>
+
+</div>
+
+</div>
+
+<div id="scratchPage">
+
+<div id="scratchText">
+
+✨ Scratch Here ✨
+
+</div>
+
+<div id="invite">
+
+<div class="top">
+
+💍
+
+</div>
+
+<div class="title">
+
+Wedding
+
+</div>
+
+<div class="line"></div>
+
+<div class="names">
+
+Ajeet
+
+❤️
+
+Payal
+
+</div>
+
+<div class="line"></div>
+
+<div class="date">
+
+20 February 2031
+
+</div>
+
+<div id="typing"></div>
+
+<div id="countdown"></div>
+<div id="venue">
+
+    <h3>📍 Wedding Venue</h3>
+
+    <p>
+        Nagauli,<br>
+        Basantpur,Siwan,Bihar
+    </p>
+
+    <button onclick="openMap()">
+        📍 Open Google Maps
+    </button>
+
+</div>
+
+</div>
+<div id="storyPopup">
+
+    <div class="storyBox">
+
+        <h2>❤️ A Beautiful Journey ❤️</h2>
+
+        <p id="storyText"></p>
+
+    </div>
+
+</div>
+
+<canvas id="scratch"></canvas>
+
+</div>
+
+<script>
+const loading=document.getElementById("loading");
+const greeting=document.getElementById("greeting");
+const scratchPage=document.getElementById("scratchPage");
+const invite=document.getElementById("invite");
+const canvas=document.getElementById("scratch");
+const ctx=canvas.getContext("2d");
+
+const envelope=document.getElementById("envelope");
+const cover=document.getElementById("cover");
+const letter=document.getElementById("letter");
+
+const namePage=document.getElementById("namePage");
+
+const guestName=document.getElementById("guestName");
+
+const welcomeGuest=document.getElementById("welcomeGuest");
+
+setTimeout(()=>{loading.style.display="none";envelope.style.display="block";},2000);
+
+function saveName(){
+
+let name=guestName.value.trim();
+
+if(name==""){
+
+alert("Please Enter Your Name");
+
+return;
+
+}
+localStorage.setItem("guest",name);
+welcomeGuest.innerHTML="Hello <br><b>"+name+
+"</b> ❤️<br><br>You Are Our Special Guest";
+
+namePage.style.display="none";
+
+greeting.style.display="flex";
+
+}
+
+function openScratch(){
+ greeting.style.display="none";
+ scratchPage.style.display="flex";
+ canvas.width=invite.offsetWidth;
+ canvas.height=invite.offsetHeight;
+ canvas.style.left=invite.offsetLeft+"px";
+ canvas.style.top=invite.offsetTop+"px";
+ ctx.fillStyle="#aaa";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle="#fff";
+ ctx.font="bold 28px Arial";
+ ctx.textAlign="center";
+ ctx.fillText("Scratch Here",canvas.width/2,canvas.height/2);
+ document.getElementById("music").play().catch(()=>{});
+
+ startCountdown();
+}
+
+let msg="हल्दी है चंदन है रिश्तो का बंधन है मेरे चाचा की शादी में आप लोग का अभिनंदन है -- Prisha Pihu ❤️";
+
+let i=0;
+
+function startTyping(){
+
+typing.textContent="";
+
+i=0;
+
+(function type(){
+
+if(i<msg.length){
+
+typing.textContent+=msg[i++];
+
+setTimeout(type,70);
+
+}
+
+})();
+
+}
+
+setInterval(() => {
+    let d = new Date("2031-02-20") - new Date();
+    let days = Math.max(0, Math.floor(d / (1000 * 60 * 60 * 24)));
+    countdown.textContent = "Countdown: " + days + " days";
+}, 1000);
+
+let down=false;
+canvas.onmousedown=()=>down=true;
+canvas.onmouseup=()=>{down=false;checkScratch();};
+canvas.onmousemove=e=>{if(!down)return;draw(e)};
+canvas.ontouchstart=()=>down=true;
+canvas.ontouchend=()=>{down=false;checkScratch();};
+canvas.ontouchmove=e=>{draw(e.touches[0]);e.preventDefault();};
+
+function draw(e){
+ const r=canvas.getBoundingClientRect();
+ ctx.globalCompositeOperation="destination-out";
+ ctx.beginPath();
+ ctx.arc(e.clientX-r.left,e.clientY-r.top,20,0,Math.PI*2);
+ ctx.fill();
+}
+
+function checkScratch(){
+
+    const pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+
+    let transparent = 0;
+
+    for(let i=3;i<pixels.length;i+=4){
+
+        if(pixels[i]===0){
+
+            transparent++;
+
+        }
+
+    }
+
+    const percent = transparent/(canvas.width*canvas.height);
+
+    if(percent > 0.45){
+
+        canvas.style.opacity="0";
+
+        canvas.style.pointerEvents="none";
+
+        fireworks();
+
+        showStory();
+    }
+
+}
+
+function startCountdown(){
+
+setInterval(()=>{
+
+let d=new Date("2031-02-20")-new Date();
+
+let days=Math.max(0,Math.floor(d/(1000*60*60*24)));
+
+countdown.textContent="Countdown : "+days+" Days";
+
+},1000);
+
+}
+
+function fireworks(){
+
+for(let i=0;i<250;i++){
+
+let f=document.createElement("div");
+
+f.className="firework";
+
+f.style.background=`hsl(${Math.random()*360},100%,50%)`;
+
+f.style.left=window.innerWidth/2+"px";
+
+f.style.top=window.innerHeight/2+"px";
+
+f.style.setProperty("--x",(Math.random()*700-350)+"px");
+
+f.style.setProperty("--y",(Math.random()*700-350)+"px");
+
+document.body.appendChild(f);
+
+setTimeout(()=>{
+
+f.remove();
+
+},1000);
+
+}
+
+}
+
+function showStory(){
+
+const popup=document.getElementById("storyPopup");
+
+const text=document.getElementById("storyText");
+
+popup.style.display="flex";
+
+const lines=[
+
+"✨ Once Upon A Time...",
+"❤️ Two Hearts Met...",
+"🤝 Two Families Became One...",
+"💍 A New Journey Begins..."
+
+];
+
+let i=0;
+
+text.innerHTML="";
+
+function typing(){
+
+if(i<lines.length){
+
+text.innerHTML+=lines[i]+"<br><br>";
+
+i++;
+
+setTimeout(typing,1200);
+
+}else{
+
+setTimeout(()=>{
+
+popup.style.display="none";
+
+startTyping();
+
+},2500);
+
+}
+
+}
+
+typing();
+
+}
+
+envelope.onclick=function(){
+
+cover.style.transform="rotateX(180deg)";
+letter.style.transform="translateY(-80px)";
+
+setTimeout(()=>{
+
+envelope.style.display="none";
+namePage.style.display="flex";
+
+},1000);
+
+}
+
+function openMap(){
+
+    window.open(
+        "https://maps.app.goo.gl/LkVWZnvBhPt6W4pc9?g_st=aw",
+        "_blank"
+    );
+
+}
+
+guestName.addEventListener("keypress",function(e){
+
+if(e.key==="Enter"){
+
+saveName();
+
+}
+
+});
+</script>
+
+<audio id="music" loop>
+<source src="Dhadkane Badh Rahi Hai.mpeg">
+</audio>
+</body>
+</html>
